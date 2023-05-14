@@ -21,10 +21,12 @@ namespace MapTileGridCreator.SerializeSystem
 		public string _name;
 
 		[SerializeField]
-		public float _size_cell = 1;
+		//		public float _size_cell = 1;
+		public Vector3 _size_cell;
 
 		[SerializeField]
-		public float _gap = 0;
+		//		public float _gap = 0;
+		public Vector3 _gap;
 
 		[SerializeField]
 		public List<CellDTO> _map;
@@ -34,7 +36,7 @@ namespace MapTileGridCreator.SerializeSystem
 			_type = grid.GetTypeGrid();
 			_name = grid.name;
 			_size_cell = grid.SizeCell;
-			_gap = grid.GapRatio;
+			_gap = grid.Gap;
 
 			_map = new List<CellDTO>();
 			Dictionary<Vector3Int, Cell>.Enumerator it = grid.GetEnumerator();
@@ -50,7 +52,7 @@ namespace MapTileGridCreator.SerializeSystem
 			Grid3D grid = FuncEditor.InstantiateGrid3D(_type);
 			grid.name = _name;
 			grid.SizeCell = _size_cell;
-			grid.GapRatio = _gap;
+			grid.Gap = _gap;
 
 			foreach (CellDTO celldto in _map)
 			{

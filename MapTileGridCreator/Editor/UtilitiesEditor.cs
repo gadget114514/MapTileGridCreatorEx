@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using MapTileGridCreator.Core;
@@ -91,22 +91,23 @@ namespace MapTileGridCreator.Utilities
 		/// <param name="size_grid">The size of the grid.</param>
 		private static void DebugSquareGrid(Grid3D grid, Color color, int offset_grid_y = 0, int size_grid = 10)
 		{
+			//	Debug.Log("SquareGrid " + grid.SizeCell.x + " " + grid.SizeCell.z);
 			using (new Handles.DrawingScope(color))
 			{
 				Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
 				Vector3 pos = grid.transform.position;
-				float CaseSize = grid.SizeCell * grid.GapRatio;
-				pos.y += offset_grid_y - CaseSize / 2.0f;
+				Vector3 CaseSize = V3M.add(grid.SizeCell, grid.Gap);
+				//	pos.y += offset_grid_y - CaseSize.y / 2.0f;
 				for (float z = -size_grid; z < size_grid; z++)
 				{
-					Handles.DrawLine(pos + new Vector3(-size_grid, 0, z + 0.5f) * CaseSize,
-									pos + new Vector3(size_grid, 0, z + 0.5f) * CaseSize);
+					Handles.DrawLine(pos + V3M.mult(new Vector3(-size_grid, 0, z + 0.5f),CaseSize),
+						pos + V3M.mult(new Vector3(size_grid, 0, z + 0.5f),CaseSize));
 				}
 
 				for (float x = -size_grid; x < size_grid; x++)
 				{
-					Handles.DrawLine(pos + new Vector3(x + 0.5f, 0, -size_grid) * CaseSize,
-									pos + new Vector3(x + 0.5f, 0, size_grid) * CaseSize);
+					Handles.DrawLine(pos + V3M.mult(new Vector3(x + 0.5f, 0, -size_grid),CaseSize),
+						pos + V3M.mult(new Vector3(x + 0.5f, 0, size_grid),CaseSize));
 				}
 			}
 		}
@@ -124,7 +125,9 @@ namespace MapTileGridCreator.Utilities
 			{
 				Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
 				Vector3 pos = grid.transform.position;
-				float CaseSize = grid.SizeCell * grid.GapRatio;
+				//		Vector3 CaseSize = V3M.add(grid.SizeCell,grid.Gap);
+				float CaseSize = 1.0f;
+				Debug.Log("Hexagon is not supported");
 				pos.y += offset_grid_y - CaseSize / 2.0f;
 
 				List<Vector3> axes = grid.GetAxes();
@@ -224,7 +227,7 @@ namespace MapTileGridCreator.Utilities
 			Cell cell = gameObject.GetComponent<Cell>();
 			if (cell == null)
 			{
-				gameObject.AddComponent<Cell>();
+				cell = gameObject.AddComponent<Cell>();
 			}
 			grid.ReplaceCell(index, cell);
 			Undo.RegisterCreatedObjectUndo(cell.gameObject, "Cell replaced");
@@ -232,7 +235,36 @@ namespace MapTileGridCreator.Utilities
 			Undo.CollapseUndoOperations(group);
 			return cell;
 		}
+		public static Cell MoveCell(Grid3D grid, Cell old, Vector3 move)
+		{
+			Undo.SetCurrentGroupName("Move Cell");
+			int group = Undo.GetCurrentGroup();
 
+			//	Undo.RegisterCreatedObjectUndo(old.gameObject, "move cell");
+
+
+			GameObject gameObject = old.gameObject;
+
+			Vector3Int index = old.GetIndex();
+
+			Vector3Int newindex = index + new Vector3Int(Mathf.RoundToInt(move.x), Mathf.RoundToInt(move.y), Mathf.RoundToInt(move.z));
+	
+			if (grid.HaveCell(ref newindex)) {
+				Debug.Log("already occupied");
+				return null;
+			}
+			
+			grid.DeleteCell(old);
+			
+			
+			grid.AddCell(newindex, old);
+			gameObject.transform.position = old.transform.position + V3M.mult(move, grid.SizeCell);
+			
+			gameObject.name = newindex.x + "_" + newindex.y + "_" + newindex.z;
+
+			//       Undo.CollapseUndoOperations(group);
+			return old;
+		}
 		/// <summary>
 		/// Destroy a cell with his gameobject. Do nothing if not instantiated.
 		/// </summary>

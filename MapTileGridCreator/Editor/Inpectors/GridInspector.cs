@@ -48,7 +48,7 @@ namespace MapTileGridCreator.CustomInpectors
 			GUI.enabled = true;
 			if (GUILayout.Button("Show tools window"))
 			{
-				MapTileGridCreatorWindow.OpenWindows();
+				MapTileGridCreatorWindow.OpenWindows(_grid);
 			}
 		}
 	}
