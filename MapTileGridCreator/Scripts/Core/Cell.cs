@@ -42,7 +42,7 @@ namespace MapTileGridCreator.Core
 		public void ResetTransform()
 		{
 			transform.localPosition = _parent.GetLocalPositionCell(ref _grid_index);
-			transform.localScale = Vector3.one * _parent.SizeCell;
+			transform.localScale = Vector3.one;
 			transform.rotation = _parent.GetDefaultRotation();
 		}
 

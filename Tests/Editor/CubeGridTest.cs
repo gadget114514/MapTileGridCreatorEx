@@ -26,6 +26,8 @@ namespace MapTileGridCreator.Tests
 			Assert.IsNotNull(cell);
 			return cell;
 		}
+		
+		private Vector3 _ran_int3() {  return new Vector3(_ran_int(), _ran_int(), _ran_int()); }
 
 		/////////////////////////////////////////
 		/// Tests
@@ -97,8 +99,8 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_GetIndexByPosition_False()
 		{
-			_grid.SizeCell = 1;
-			_grid.GapRatio = 0;
+			_grid.SizeCell = Vector3.one;
+			_grid.Gap = Vector3.zero;
 
 			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int());
 
@@ -112,8 +114,8 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_GetIndexByPosition_Unit1()
 		{
-			_grid.SizeCell = 1;
-			_grid.GapRatio = 0;
+			_grid.SizeCell = Vector3.one;
+			_grid.Gap = Vector3.zero;
 
 			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int());
 
@@ -127,10 +129,10 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_GetIndexByPosition_RandomUnit()
 		{
-			_grid.SizeCell = _ran_int();
-			_grid.GapRatio = _ran_int();
+			_grid.SizeCell = _ran_int3();
+			_grid.Gap = _ran_int3();
 
-			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int()) * _grid.SizeCell;
+			Vector3 position = V3M.mult( new Vector3(_ran_int(), _ran_int(), _ran_int()), _grid.SizeCell);
 
 			Cell cell_1 = CreateCell();
 			cell_1.transform.localPosition = position;
@@ -142,8 +144,8 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_AddAndGetCell_PositionUnit1()
 		{
-			_grid.SizeCell = 1;
-			_grid.GapRatio = 0;
+			_grid.SizeCell = Vector3.one;
+			_grid.Gap = Vector3.zero;
 
 			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int());
 
@@ -159,10 +161,10 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_AddAndGetCell_Position()
 		{
-			_grid.SizeCell = _ran_int();
-			_grid.GapRatio = _ran_int();
+			_grid.SizeCell = _ran_int3();
+			_grid.Gap = _ran_int3();
 
-			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int()) * _grid.SizeCell;
+			Vector3 position = V3M.mult( new Vector3(_ran_int(), _ran_int(), _ran_int()), _grid.SizeCell);
 
 			Cell cell_1 = CreateCell();
 			cell_1.transform.localPosition = position;
@@ -176,8 +178,8 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_AddCellByPosition_Unit1()
 		{
-			_grid.SizeCell = 1;
-			_grid.GapRatio = 0;
+			_grid.SizeCell = Vector3.one;
+			_grid.Gap = Vector3.zero;
 
 			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int());
 
@@ -193,10 +195,10 @@ namespace MapTileGridCreator.Tests
 		{
 			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int());
 			_grid.transform.position += position;
-			_grid.SizeCell = _ran_int();
-			_grid.GapRatio = _ran_int();
+			_grid.SizeCell = _ran_int3();
+			_grid.Gap = _ran_int3();
 
-			Vector3 positionCell = new Vector3(_ran_int(), _ran_int(), _ran_int()) * (_grid.SizeCell * _grid.GapRatio);
+			Vector3 positionCell = V3M.mult(new Vector3(_ran_int(), _ran_int(), _ran_int()), V3M.add(_grid.SizeCell, _grid.Gap));
 			Vector3 pos = _grid.TransformPositionToGridPosition(position + positionCell) - position;
 			Assert.AreEqual(positionCell, pos);
 		}
@@ -204,10 +206,10 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_AddCellByPosition_RandomUnit()
 		{
-			_grid.SizeCell = _ran_int();
-			_grid.GapRatio = _ran_int();
+			_grid.SizeCell = _ran_int3();
+			_grid.Gap = _ran_int3();
 
-			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int()) * (_grid.SizeCell * _grid.GapRatio);
+			Vector3 position = V3M.mult(new Vector3(_ran_int(), _ran_int(), _ran_int()), V3M.add(_grid.SizeCell, _grid.Gap));
 
 			Cell cell = CreateCell();
 			cell.transform.localPosition = position;
@@ -220,10 +222,10 @@ namespace MapTileGridCreator.Tests
 		[Test]
 		public void Test_TryGetCellByPosition()
 		{
-			_grid.SizeCell = _ran_int();
-			_grid.GapRatio = _ran_int();
+			_grid.SizeCell = _ran_int3();
+			_grid.Gap = _ran_int3();
 
-			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int()) * (_grid.SizeCell * _grid.GapRatio);
+			Vector3 position = V3M.mult(new Vector3(_ran_int(), _ran_int(), _ran_int()), V3M.add(_grid.SizeCell, _grid.Gap));
 
 			Cell cell = CreateCell();
 			cell.transform.localPosition = position;
@@ -236,10 +238,10 @@ namespace MapTileGridCreator.Tests
 		public void Test_GetPositionCell()
 		{
 			Vector3 origin = new Vector3(_ran_int(), _ran_int(), _ran_int());
-			_grid.SizeCell = _ran_int();
-			_grid.GapRatio = _ran_int();
+			_grid.SizeCell = _ran_int3();
+			_grid.Gap = _ran_int3();
 
-			Vector3 position = new Vector3(_ran_int(), _ran_int(), _ran_int()) * (_grid.SizeCell * _grid.GapRatio) + origin;
+			Vector3 position = V3M.mult(new Vector3(_ran_int(), _ran_int(), _ran_int()), V3M.add(_grid.SizeCell, _grid.Gap)) + origin;
 
 			Cell cell = CreateCell();
 			cell.transform.localPosition = position;

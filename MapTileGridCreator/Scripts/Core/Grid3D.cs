@@ -24,15 +24,21 @@ namespace MapTileGridCreator.Core
 		[SerializeField]
 		[Min(0.001f)]
 		[Tooltip("Permit to handle and correct the children's size. ")]
-		private float _size_cell = 1;
+		//	private float _size_cell = 1;
+		private Vector3 _size_cell;
 
 		[SerializeField]
 		[Tooltip("Permit to handle and correct the children's space beetween them. ")]
-		private float _gap_ratio = 1;
+		//		private float _gap_ratio = 1;
+		//		private Vector3 _gap_ratio;
+		private Vector3 _gap;
 
 		[SerializeField]
 		[Tooltip("Permit to handle and correct the children's default rotation. ")]
 		private Vector3 _default_rotation;
+
+		[SerializeField]
+		public string palletFolderPath;
 
 #pragma warning restore 0649
 		#endregion
@@ -249,7 +255,7 @@ namespace MapTileGridCreator.Core
 		public Vector3Int GetIndexByPosition(ref Vector3 position)
 		{
 			Vector3 localPosition = position - Origin;
-			localPosition = V3M.div(localPosition, (V3M.mult(_size_cell,_gap_ratio)));
+			localPosition = V3M.div(localPosition, (V3M.add(_size_cell,_gap)));
 			Vector3Int indexCanon = Vector3Int.RoundToInt(localPosition);
 			Vector3Int index = Vector3Int.RoundToInt(GetMatrixGridToLocalPosition().inverse.MultiplyPoint3x4(indexCanon));
 			return index;
@@ -272,7 +278,7 @@ namespace MapTileGridCreator.Core
 		public Vector3 GetLocalPositionCell(ref Vector3Int index)
 		{
 			Vector3 localPosition = GetMatrixGridToLocalPosition().MultiplyPoint3x4(index);
-			return localPosition * (_size_cell * _gap_ratio);
+			return V3M.mult(localPosition, V3M.add(_size_cell, _gap));
 		}
 
 		/// <summary>
@@ -331,6 +337,7 @@ namespace MapTileGridCreator.Core
 
 			if (HaveCell(ref index))
 			{
+				if (cell == null) { Debug.LogError("cell is null"); return null; }
 				cell.Initialize(index, this);
 				Cell delete = _map[index];
 				_map[index] = cell;
@@ -402,14 +409,15 @@ namespace MapTileGridCreator.Core
 		/// <summary>
 		/// The size cell is the true place occupied by a single cell. The total volume for grid cell is the cubed of (SizeCell + 2* Gap)
 		/// </summary>
-		public float SizeCell { get => _size_cell; set => _size_cell = value; }
+		public Vector3 SizeCell { get => _size_cell; set => _size_cell = value; }
 
 
 		/// <summary>
-		/// The Gap is the gap between two cells. The total volume for grid cell is the cubed of (SizeCell + 2* Gap)
+		/// The GapRatio is the gap ratio
+		/// gap is between two cells. The total volume for grid cell is the cubed of (SizeCell + 2* Gap)
 		/// </summary>
-		public float GapRatio { get => _gap_ratio; set => _gap_ratio = value; }
-
+		public Vector3 GapRatio { get => V3M.div(V3M.add(_gap,_size_cell), _size_cell); private set {} }
+		public Vector3 Gap { get => _gap; set => _gap = value; }
 		#endregion
 
 		#region Private

@@ -24,6 +24,8 @@ namespace MapTileGridCreator.CubeImplementation
 		[SerializeField]
 		private CubeConnexity _connexity;
 
+
+
 #pragma warning restore 0649
 		#endregion
 
