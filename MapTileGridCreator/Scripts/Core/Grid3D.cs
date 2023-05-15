@@ -25,7 +25,7 @@ namespace MapTileGridCreator.Core
 		[Min(0.001f)]
 		[Tooltip("Permit to handle and correct the children's size. ")]
 		//	private float _size_cell = 1;
-		private Vector3 _size_cell;
+		private Vector3 _size_cell = Vector3.one;
 
 		[SerializeField]
 		[Tooltip("Permit to handle and correct the children's space beetween them. ")]
@@ -255,7 +255,10 @@ namespace MapTileGridCreator.Core
 		public Vector3Int GetIndexByPosition(ref Vector3 position)
 		{
 			Vector3 localPosition = position - Origin;
-			localPosition = V3M.div(localPosition, (V3M.add(_size_cell,_gap)));
+			Vector3 val = V3M.add(_size_cell, _gap);
+			localPosition = V3M.div(localPosition, val);
+	//		Debug.Log("localPosition=" + localPosition + " " + val);
+
 			Vector3Int indexCanon = Vector3Int.RoundToInt(localPosition);
 			Vector3Int index = Vector3Int.RoundToInt(GetMatrixGridToLocalPosition().inverse.MultiplyPoint3x4(indexCanon));
 			return index;
@@ -297,6 +300,7 @@ namespace MapTileGridCreator.Core
 		public Vector3 TransformPositionToGridPosition(Vector3 position)
 		{
 			Vector3Int index = GetIndexByPosition(ref position);
+			Debug.Log("index=" + index);
 			return GetPositionCell(index);
 		}
 
@@ -307,6 +311,8 @@ namespace MapTileGridCreator.Core
 		/// <param name="cell">The cell data to initialize and register.</param>
 		public void AddCell(Vector3Int index, Cell cell)
 		{
+			Debug.Log("AddCell " + index.x + " " + index.y + " " + index.z);
+
 			CheckIsInitialised();
 			cell.Initialize(index, this);
 			_map.Add(index, cell);

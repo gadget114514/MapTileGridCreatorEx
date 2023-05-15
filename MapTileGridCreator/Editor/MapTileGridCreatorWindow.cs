@@ -114,7 +114,12 @@ public class MapTileGridCreatorWindow : EditorWindow
 	private void RefreshPallet()
 	{
 		_pallet.Clear();
+
+		Debug.Log("Path=" + _path_pallet);
+
 		string[] prefabFiles = Directory.GetFiles(_path_pallet, "*.prefab");
+		if (prefabFiles == null) return;
+		Debug.Log("Prefabs=" + prefabFiles.Length);
 		foreach (string prefabFile in prefabFiles)
 		{
 			//	Debug.Log("prefabs="+prefabFile);
@@ -425,6 +430,8 @@ public class MapTileGridCreatorWindow : EditorWindow
 
 	private void PaintInput(Vector3 pointWorld)
 	{
+	
+
 		if (Event.current.type == EventType.Layout)
 		{
 			HandleUtility.AddDefaultControl(0);
@@ -433,6 +440,8 @@ public class MapTileGridCreatorWindow : EditorWindow
 		//Apply paint
 		if (_pallet_index < _pallet.Count && Event.current.type == EventType.MouseDown && Event.current.button == 0)
 		{
+			Debug.Log("PaintInput=" + pointWorld);
+
 			GameObject prefab = _pallet[_pallet_index];
 			FuncEditor.InstantiateCell(prefab, _grid, pointWorld);
 		}
@@ -499,11 +508,13 @@ public class MapTileGridCreatorWindow : EditorWindow
 	private Vector3 GetGridPositionInput(float offset_normal_factor, bool canCollideWithPlane)
 	{
 		Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-		Vector3 hitPoint;
+		Vector3 hitPoint = Vector3.zero;
 		float enter = 0.0f;
 		bool isPlaneCollided = canCollideWithPlane && _plane_y.Raycast(ray, out enter);
 		if (Physics.Raycast(ray, out RaycastHit hit, _dist_default_interaction * (_grid.SizeCell.y + 1)) && (!isPlaneCollided || (isPlaneCollided && hit.distance < enter)))
 		{
+			Debug.Log("Raycast 1");
+
 			hitPoint = hit.point;
 			if (hit.collider.gameObject.GetComponent<Cell>() != null || hit.collider.GetComponentInParent<Cell>())
 			{
@@ -512,11 +523,21 @@ public class MapTileGridCreatorWindow : EditorWindow
 		}
 		else if (isPlaneCollided && enter < _dist_default_interaction * _grid.SizeCell.y)
 		{
+			Debug.Log("Raycast 2");
+
 			hitPoint = ray.GetPoint(enter);
 		}
 		else
 		{
-			hitPoint = ray.GetPoint(_dist_default_interaction * _grid.SizeCell.y);
+			Debug.Log("Raycast 3");
+			Camera cam = SceneView.currentDrawingSceneView.camera;
+		//	Plane p = new Plane(Vector3.up, Vector3.zero);
+	//		cam.transform.position, ray.
+			//	hitPoint = ray.GetPoint(_dist_default_interaction * _grid.SizeCell.y);
+			if (_plane_y.Raycast(ray, out enter)) {
+				hitPoint = ray.GetPoint(enter);
+				Debug.Log("3 = " + enter + " " + hitPoint);
+			}
 		}
 
 		return hitPoint;
@@ -524,11 +545,13 @@ public class MapTileGridCreatorWindow : EditorWindow
 
 	private void DebugCellAtPosition(Vector3 position, Color color, float size_factor = 1f)
 	{
+		Debug.Log("Cell At Position " + position + " " + color);
 		using (new Handles.DrawingScope(color))
 		{
 			Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
 			Vector3 pos = _grid.TransformPositionToGridPosition(position);
 			Handles.color = color;
+			Debug.Log("pos = " + pos);
 			Handles.DrawWireCube(pos, (_grid.SizeCell * size_factor));
 		}
 	}
