@@ -37,7 +37,7 @@ public class PlayerGridMovement : MonoBehaviour
 	private void Start()
 	{
 		_rb = GetComponent<Rigidbody>();
-		Vector3 dest = _grid.GetPositionCell(_index_grid);
+		Vector3 dest = _grid.GetPositionCell(ref _index_grid);
 		_rb.MovePosition(dest);
 		_is_moving = false;
 	}
@@ -110,7 +110,7 @@ public class PlayerGridMovement : MonoBehaviour
 	/// </summary>
 	private void Moving()
 	{
-		Vector3 dest = _grid.GetPositionCell(_index_grid);
+		Vector3 dest = _grid.GetPositionCell(ref _index_grid);
 		if (Vector3.Distance(dest, transform.position) > 0.1f)
 		{
 			Vector3 lerp = Vector3.Lerp(dest, transform.position, _speed_move);

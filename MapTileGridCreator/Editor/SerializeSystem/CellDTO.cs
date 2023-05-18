@@ -43,7 +43,7 @@ namespace MapTileGridCreator.SerializeSystem
 		public Cell ToCell(Grid3D grid)
 		{
 			GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(_pathPrefab);
-			Cell cell = FuncEditor.InstantiateCell(prefab, grid, _index);
+			Cell cell = FuncEditor.InstantiateCell(prefab, grid, _index, Quaternion.identity);
 			cell.transform.localPosition = _localposition;
 			cell.transform.localRotation = Quaternion.Euler(_localrotation);
 			cell.transform.localScale = _localscale;

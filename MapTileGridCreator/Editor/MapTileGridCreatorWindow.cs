@@ -42,6 +42,8 @@ public class MapTileGridCreatorWindow : EditorWindow
 	private int _size_grid = 20;
 	[SerializeField]
 	private int _offset_grid_y = 0;
+	[SerializeField]
+	private Quaternion rotation;
 
 	private Vector2 _scroll_position;
 
@@ -279,7 +281,8 @@ public class MapTileGridCreatorWindow : EditorWindow
 					{
 						if (m != null && !m.Pass)
 						{
-							Vector3 posTrans = _grid.GetPositionCell(m.StartIndex);
+							Vector3Int startIdx = m.StartIndex;
+							Vector3 posTrans = _grid.GetPositionCell(ref startIdx );
 							DebugCellAtPosition(posTrans, DebugsColor.start_modifier, 1.1f);
 							posTrans.y += _grid.SizeCell.y;
 							Handles.Label(posTrans, "Start modifier " + i);
@@ -381,8 +384,8 @@ public class MapTileGridCreatorWindow : EditorWindow
 		Vector3Int displacement = destinationIndex - _selection[0].GetIndex();
 		foreach (Cell c in _selection)
 		{
-			Vector3Int index = c.GetIndex();
-			Vector3 destination = _grid.GetPositionCell(index + displacement);
+			Vector3Int index = c.GetIndex() + displacement;
+			Vector3 destination = _grid.GetPositionCell(ref index);
 			DebugCellAtPosition(destination, DebugsColor.destination_editor);
 		}
 	}
@@ -443,7 +446,7 @@ public class MapTileGridCreatorWindow : EditorWindow
 			Debug.Log("PaintInput=" + pointWorld);
 
 			GameObject prefab = _pallet[_pallet_index];
-			FuncEditor.InstantiateCell(prefab, _grid, pointWorld);
+			FuncEditor.InstantiateCell(prefab, _grid, pointWorld, rotation);
 		}
 	}
 
@@ -536,7 +539,7 @@ public class MapTileGridCreatorWindow : EditorWindow
 			//	hitPoint = ray.GetPoint(_dist_default_interaction * _grid.SizeCell.y);
 			if (_plane_y.Raycast(ray, out enter)) {
 				hitPoint = ray.GetPoint(enter);
-				Debug.Log("3 = " + enter + " " + hitPoint);
+	//			Debug.Log("3 = " + enter + " " + hitPoint);
 			}
 		}
 
@@ -608,6 +611,53 @@ public class MapTileGridCreatorWindow : EditorWindow
 			}
 		}
 		GUILayout.EndHorizontal();
+		if (_grid != null)
+		{
+			if (GUILayout.Button("Check"))
+			{
+				var cells = _grid.GetComponentsInChildren<Cell>();
+				Dictionary<Vector3Int, Cell> dic = new Dictionary<Vector3Int, Cell>();
+				for (int i = 0; i < cells.Length; i++)
+				{
+					if (dic.ContainsKey(cells[i].GetIndex()))
+					{
+						Debug.Log("Check error at " + cells[i].GetIndex() + " " + dic[cells[i].GetIndex()].gameObject  + dic[cells[i].GetIndex()].gameObject.GetInstanceID() + " and " + cells[i].gameObject.name + cells[i].gameObject.GetInstanceID());
+					} else 
+					dic[cells[i].GetIndex()] = cells[i];
+				}
+			}
+			if (GUILayout.Button("Clear Dup"))
+			{
+				var cells = _grid.GetComponentsInChildren<Cell>();
+				Dictionary<Vector3Int, Cell> dic = new Dictionary<Vector3Int, Cell>();
+				for (int i = 0; i < cells.Length; i++)
+				{
+					if (dic.ContainsKey(cells[i].GetIndex()))
+					{
+						Debug.Log("Check error at " + cells[i].GetIndex() + " " + dic[cells[i].GetIndex()].gameObject + dic[cells[i].GetIndex()].gameObject.GetInstanceID() + " and " + cells[i].gameObject.name + cells[i].gameObject.GetInstanceID());
+						if (dic[cells[i].GetIndex()].gameObject.transform.position == Vector3.zero)
+						{
+							if (cells[i].GetIndex() != Vector3Int.zero)
+							{
+								DestroyImmediate(dic[cells[i].GetIndex()].gameObject);
+							}
+						}
+						if (cells[i].gameObject.transform.position == Vector3.zero)
+						{
+							if (cells[i].GetIndex() != Vector3Int.zero)
+							{
+								DestroyImmediate(cells[i].gameObject);
+							}
+						}
+					}
+					else
+					{
+						dic[cells[i].GetIndex()] = cells[i];
+					}
+				}
+			}
+		}
+
 
 		if (_grid != null)
 		{
@@ -617,6 +667,9 @@ public class MapTileGridCreatorWindow : EditorWindow
 				_size_grid = EditorGUILayout.IntField("Size grid", _size_grid);
 				_offset_grid_y = EditorGUILayout.IntField("Offset Y Ground Plane", _offset_grid_y);
 			}
+				rotation = Quaternion.Euler(EditorGUILayout.Vector3Field("Rotation", rotation.eulerAngles));
+			Vector3 v = rotation.eulerAngles;
+			if (GUILayout.Button("Rotation")) rotation = Quaternion.Euler(new Vector3(v.x, Mathf.RoundToInt(v.y + 90) >= 360 ? 0 : (v.y+90), v.z)) ;
 
 			FuncEditor.DrawUILine(Color.gray);
 			EditorGUILayout.LabelField("Tools :", EditorStyles.boldLabel);

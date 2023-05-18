@@ -65,12 +65,12 @@ namespace MapTileGridCreator.Utilities
 			{
 				case TypeGrid3D.Cube:
 					{
-						Gizmos.DrawWireCube(grid.GetPositionCell(index), V3M.add(grid.SizeCell, new Vector3(offsetSize, offsetSize, offsetSize)));
+						Gizmos.DrawWireCube(grid.GetPositionCell(ref index), V3M.add(grid.SizeCell, new Vector3(offsetSize, offsetSize, offsetSize)));
 					}
 					break;
 				case TypeGrid3D.Hexagonal:
 					{
-						Gizmos.DrawMesh(ProceduralMesh.GetHexagonMesh(), grid.GetPositionCell(index), Quaternion.identity, V3M.add (grid.SizeCell, new Vector3(offsetSize, offsetSize, offsetSize)));
+						Gizmos.DrawMesh(ProceduralMesh.GetHexagonMesh(), grid.GetPositionCell(ref index), Quaternion.identity, V3M.add (grid.SizeCell, new Vector3(offsetSize, offsetSize, offsetSize)));
 					}
 					break;
 				default:

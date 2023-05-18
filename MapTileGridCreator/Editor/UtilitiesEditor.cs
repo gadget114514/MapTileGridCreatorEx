@@ -95,7 +95,7 @@ namespace MapTileGridCreator.Utilities
 			using (new Handles.DrawingScope(color))
 			{
 				Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
-				Vector3 pos = grid.transform.position;
+				Vector3 pos = grid.Origin;
 				Vector3 CaseSize = V3M.add(grid.SizeCell, grid.Gap);
 				//	pos.y += offset_grid_y - CaseSize.y / 2.0f;
 				for (float z = -size_grid; z < size_grid; z++)
@@ -171,10 +171,10 @@ namespace MapTileGridCreator.Utilities
 		/// <param name="grid">The grid the cell will belongs.</param>
 		/// <param name="position"> The position of the cell.</param>
 		/// <returns>The cell component associated to the gameobject.</returns>
-		public static Cell InstantiateCell(GameObject prefab, Grid3D grid, Vector3 position)
+		public static Cell InstantiateCell(GameObject prefab, Grid3D grid, Vector3 position, Quaternion rot)
 		{
 			Vector3Int index = grid.GetIndexByPosition(ref position);
-			return InstantiateCell(prefab, grid, index);
+			return InstantiateCell(prefab, grid, index, rot);
 		}
 
 		/// <summary>
@@ -184,11 +184,30 @@ namespace MapTileGridCreator.Utilities
 		/// <param name="grid">The grid the cell will belongs.</param>
 		/// <param name="index"> The index of the cell.</param>
 		/// <returns>The cell component associated to the gameobject.</returns>
-		public static Cell InstantiateCell(GameObject prefab, Grid3D grid, Vector3Int index)
+		public static Cell InstantiateCell(GameObject prefab, Grid3D grid, Vector3Int index, Quaternion rot)
 		{
 			GameObject gameObject = PrefabUtility.InstantiatePrefab(prefab, grid.transform) as GameObject;
 			gameObject.name = index.x + "_" + index.y + "_" + index.z + "_" + gameObject.name;
 
+            MultiCell mc = gameObject.GetComponent<MultiCell>();
+            if (mc) {
+            
+            Cell[] cells = gameObject.GetComponents<Cell>();
+			if (cells == null)
+			{
+                for (int i = 0; i < mc.Cells.Length; i++) {
+				  gameObject.AddComponent<Cell>();
+				}
+			}
+			cells = gameObject.GetComponents<Cell>();
+            for (int i = 0; i < mc.Cells.Length; i++) {
+              Vector3Int cellpos = mc.Cells[i];
+              grid.AddCell(index + cellpos, cells[i]);
+              cells[i].ResetTransform();
+            }
+				Debug.Log("Multi cell");
+				return cells[0];
+            } else {
 			Cell cell = gameObject.GetComponent<Cell>();
 			if (cell == null)
 			{
@@ -196,8 +215,11 @@ namespace MapTileGridCreator.Utilities
 			}
 			grid.AddCell(index, cell);
 			cell.ResetTransform();
+				cell.gameObject.transform.rotation = rot;
 			Undo.RegisterCreatedObjectUndo(cell.gameObject, "Cell created");
-			return cell;
+				return cell;
+			}
+
 		}
 
 		/// <summary>
@@ -296,7 +318,7 @@ namespace MapTileGridCreator.Utilities
 				GameObject prefab = GetPrefabFromInstance(prefabInstance);
 				if (cdest == null)
 				{
-					InstantiateCell(prefab, grid, index);
+					InstantiateCell(prefab, grid, index, Quaternion.identity);
 				}
 				else if (overwrite)
 				{

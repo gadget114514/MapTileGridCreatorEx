@@ -121,8 +121,8 @@ namespace MapTileGridCreator.Core
 				}
 				catch (Exception e)
 				{
-					Debug.LogError(e.Message);
-					GameObject.DestroyImmediate(c.gameObject);
+					Debug.LogError(e.Message + " at " + this.gameObject) ;
+		//			GameObject.DestroyImmediate(c.gameObject);
 				}
 			}
 		}
@@ -254,7 +254,7 @@ namespace MapTileGridCreator.Core
 		/// <returns>The index corresponding.</returns>
 		public Vector3Int GetIndexByPosition(ref Vector3 position)
 		{
-			Vector3 localPosition = position - Origin;
+			Vector3 localPosition = position - Origin - transform.position;
 			Vector3 val = V3M.add(_size_cell, _gap);
 			localPosition = V3M.div(localPosition, val);
 	//		Debug.Log("localPosition=" + localPosition + " " + val);
@@ -281,16 +281,16 @@ namespace MapTileGridCreator.Core
 		public Vector3 GetLocalPositionCell(ref Vector3Int index)
 		{
 			Vector3 localPosition = GetMatrixGridToLocalPosition().MultiplyPoint3x4(index);
-			return V3M.mult(localPosition, V3M.add(_size_cell, _gap));
+			return Origin + V3M.mult(localPosition, V3M.add(_size_cell, _gap));
 		}
 
 		/// <summary>
 		/// Get the position of a cell.
 		/// </summary>
 		/// <param name="index">The index cell</param>
-		public Vector3 GetPositionCell(Vector3Int index)
+		public Vector3 GetPositionCell(ref Vector3Int index)
 		{
-			return Origin + GetLocalPositionCell(ref index);
+			return transform.position + GetLocalPositionCell(ref index);
 		}
 
 		/// <summary>
@@ -300,8 +300,8 @@ namespace MapTileGridCreator.Core
 		public Vector3 TransformPositionToGridPosition(Vector3 position)
 		{
 			Vector3Int index = GetIndexByPosition(ref position);
-			Debug.Log("index=" + index);
-			return GetPositionCell(index);
+	//		Debug.Log("index=" + index);
+			return GetPositionCell(ref index);
 		}
 
 		/// <summary>
@@ -311,10 +311,15 @@ namespace MapTileGridCreator.Core
 		/// <param name="cell">The cell data to initialize and register.</param>
 		public void AddCell(Vector3Int index, Cell cell)
 		{
-			Debug.Log("AddCell " + index.x + " " + index.y + " " + index.z);
+		//	Debug.Log("AddCell " + index.x + " " + index.y + " " + index.z);
 
 			CheckIsInitialised();
 			cell.Initialize(index, this);
+
+			if (_map.ContainsKey(index))
+			{
+				Debug.Log("dup " + _map[index].gameObject + " " + index + " " + cell.gameObject);
+			}
 			_map.Add(index, cell);
 		}
 
@@ -410,7 +415,7 @@ namespace MapTileGridCreator.Core
 
 		#region Getter/Setter
 
-		public Vector3 Origin => transform.position;
+		public Vector3 Origin;
 
 		/// <summary>
 		/// The size cell is the true place occupied by a single cell. The total volume for grid cell is the cubed of (SizeCell + 2* Gap)

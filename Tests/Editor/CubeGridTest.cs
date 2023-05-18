@@ -246,7 +246,8 @@ namespace MapTileGridCreator.Tests
 			Cell cell = CreateCell();
 			cell.transform.localPosition = position;
 			_grid.AddCellByPosition(cell);
-			Vector3 pos2 = _grid.GetPositionCell(cell.GetIndex());
+			Vector3Int index = cell.GetIndex();
+			Vector3 pos2 = _grid.GetPositionCell(ref index);
 			Assert.AreEqual(position, pos2);
 		}
 

@@ -53,7 +53,7 @@ namespace MapTileGridCreator.TransformationsBank
 				{
 					if (!grid.HaveCell(ref upIndex))
 					{
-						FuncEditor.InstantiateCell(prefab, grid, upIndex);
+						FuncEditor.InstantiateCell(prefab, grid, upIndex, Quaternion.identity);
 					}
 					upIndex += grid.GetConnexAxes()[1];
 				}

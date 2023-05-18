@@ -39,7 +39,7 @@ namespace MapTileGridCreator.TransformationsBank
 		{
 			foreach (Vector3Int index in _to_instantiate)
 			{
-				FuncEditor.InstantiateCell(prefab, grid, index);
+				FuncEditor.InstantiateCell(prefab, grid, index, Quaternion.identity);
 			}
 		}
 
