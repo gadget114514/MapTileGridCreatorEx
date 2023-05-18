@@ -24,7 +24,7 @@ public class FillPlatformEditor : Editor
 
           Vector3 pointWorld = new Vector3(pf.start.x + i, pf.offy, pf.start.z + j);
 
-          GameObject go = PrefabUtility.InstantiatePrefab(pf.prefab, pf._grid.transform) as GameObject;
+          GameObject go = PrefabUtility.InstantiatePrefab(pf.prefab, pf._grid.gridRoot.transform) as GameObject;
           Vector3Int index = new Vector3Int((i - (int)pf.start.x) / (int)pf.size.x, 0, (j - (int)pf.start.z) / (int)pf.size.z);
           Cell cell = go.GetComponent<Cell>();
           if (cell == null)

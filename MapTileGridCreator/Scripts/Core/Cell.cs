@@ -73,9 +73,9 @@ namespace MapTileGridCreator.Core
 		public Grid3D GetGridParent()
 		{
 			Transform parent = transform.parent;
-			if (_parent == null && parent != null)
+			if (_parent == null)
 			{
-				_parent = parent.GetComponent<Grid3D>();
+				_parent = this.GetComponentInParent<Grid3D>();
 			}
 			return _parent;
 		}

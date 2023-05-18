@@ -186,7 +186,7 @@ namespace MapTileGridCreator.Utilities
 		/// <returns>The cell component associated to the gameobject.</returns>
 		public static Cell InstantiateCell(GameObject prefab, Grid3D grid, Vector3Int index, Quaternion rot)
 		{
-			GameObject gameObject = PrefabUtility.InstantiatePrefab(prefab, grid.transform) as GameObject;
+			GameObject gameObject = PrefabUtility.InstantiatePrefab(prefab, grid.gridRoot.transform) as GameObject;
 			gameObject.name = index.x + "_" + index.y + "_" + index.z + "_" + gameObject.name;
 
             MultiCell mc = gameObject.GetComponent<MultiCell>();
@@ -240,7 +240,7 @@ namespace MapTileGridCreator.Utilities
 				prefab = GetPrefabFromInstance(source);
 			}
 
-			GameObject gameObject = PrefabUtility.InstantiatePrefab(prefab, grid.transform) as GameObject;
+			GameObject gameObject = PrefabUtility.InstantiatePrefab(prefab, grid.gridRoot.transform) as GameObject;
 
 			Vector3Int index = old.GetIndex();
 			gameObject.transform.position = old.transform.position;

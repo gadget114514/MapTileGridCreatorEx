@@ -43,6 +43,7 @@ namespace MapTileGridCreator.Core
 #pragma warning restore 0649
 		#endregion
 
+		public GameObject gridRoot;
 		/// <summary>
 		/// Awake for auto-initialization in runtime.
 		/// </summary>
