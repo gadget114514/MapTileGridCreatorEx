@@ -272,7 +272,7 @@ namespace MapTileGridCreator.Utilities
 			Vector3Int newindex = index + new Vector3Int(Mathf.RoundToInt(move.x), Mathf.RoundToInt(move.y), Mathf.RoundToInt(move.z));
 	
 			if (grid.HaveCell(ref newindex)) {
-				Debug.Log("already occupied");
+				Debug.Log("already occupied: " + newindex);
 				return null;
 			}
 			

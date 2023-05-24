@@ -320,6 +320,7 @@ namespace MapTileGridCreator.Core
 			if (_map.ContainsKey(index))
 			{
 				Debug.Log("dup " + _map[index].gameObject + " " + index + " " + cell.gameObject);
+				return;
 			}
 			_map.Add(index, cell);
 		}
